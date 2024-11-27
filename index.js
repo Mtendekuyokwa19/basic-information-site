@@ -1,8 +1,6 @@
 const fs = require("fs");
-const http = require("node:http");
-let url = new URL("https://localhost");
-let port = 9081;
-
+const express = require("express");
+const app = express();
 function checkfileexist(filepath) {
   if (filepath.pathname === "/") {
     return "./index.html";
@@ -12,23 +10,17 @@ function checkfileexist(filepath) {
   return "./404.html";
 }
 
-const server = http.createServer((req, res) => {
-  fs.readFile(
-    checkfileexist(new URL(req.url.toString(), url + port)),
-    "utf8",
-    (err, data) => {
-      if (err) {
-        res.writeHead(404, { "Content-Type": "text/html" });
+app.get("/", (req, res) => res.sendFile("./index.html", { root: __dirname }));
 
-        return;
-      }
+app.get("/about", (req, res) =>
+  res.sendFile("./about.html", { root: __dirname }),
+);
+app.get("/contact", (req, res) =>
+  res.sendFile("./contact.html", { root: __dirname }),
+);
+app.get("/index", (req, res) =>
+  res.sendFile("./index.html", { root: __dirname }),
+);
+app.get("*", (req, res) => res.sendFile("./404.html", { root: __dirname }));
 
-      res.writeHead(200, { "Content-Type": "text/html" });
-      res.write(data.toString());
-      console.log(data);
-
-      return res.end();
-    },
-  );
-});
-server.listen(port);
+app.listen(3000);
